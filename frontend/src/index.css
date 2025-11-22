@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --forest-dark: #1a3d0a;
+        --forest-medium: #2d5016;
+        --forest-light: #4a7c2c;
+        --forest-accent: #6b9d3e;
+        --earth-brown: #8b6f47;
+        --earth-light: #d4a574;
+        --cream: #f5f1e8;
+        --moss: #7a9b76;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a3d0a 0%, #2d5016 50%, #1f4d12 100%);
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            repeating-linear-gradient(0deg,
+                transparent,
+                transparent 40px,
+                rgba(255, 255, 255, 0.03) 40px,
+                rgba(255, 255, 255, 0.03) 41px),
+            repeating-linear-gradient(90deg,
+                transparent,
+                transparent 40px,
+                rgba(255, 255, 255, 0.03) 40px,
+                rgba(255, 255, 255, 0.03) 41px),
+            radial-gradient(circle at 20% 50%, rgba(107, 157, 62, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(139, 111, 71, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    body>* {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-forest-medium hover:bg-forest-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-md;
+    }
+
+    .card {
+        @apply bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-earth-light/20;
+    }
+
+    .input-field {
+        @apply border-earth-light/40 focus:border-forest-medium focus:ring-forest-medium/30;
+    }
+}
