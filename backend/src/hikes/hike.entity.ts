@@ -40,4 +40,10 @@ export class Hike {
 
     @Column({ type: 'text', nullable: true })
     accommodation: string;
+
+    @Column({ default: 'hiking' })
+    activityType: 'hiking' | 'bicycletouring' | 'bikepacking';
+
+    @Column({ type: 'text', nullable: true })
+    coverImage: string;
 }

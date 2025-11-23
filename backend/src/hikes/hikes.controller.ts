@@ -40,4 +40,9 @@ export class HikesController {
     generateAccommodation(@Param('id') id: string) {
         return this.hikesService.generateAccommodation(id);
     }
+
+    @Post('analyze-gpx')
+    analyzeGpx(@Body() body: { gpxContent: string }) {
+        return this.hikesService.analyzeGpx(body.gpxContent);
+    }
 }

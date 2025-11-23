@@ -76,6 +76,7 @@ export const ElevationChart: React.FC<ElevationChartProps> = ({ gpxContent }) =>
             label={{ value: 'Distance (km)', position: 'insideBottom', offset: -5 }}
             tick={{ fontSize: 12 }}
             stroke="#6b7280"
+            tickFormatter={(value) => Math.ceil(value).toString()}
           />
           <YAxis 
             label={{ value: 'Elevation (m)', angle: -90, position: 'insideLeft' }}

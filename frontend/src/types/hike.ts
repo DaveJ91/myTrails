@@ -12,4 +12,6 @@ export interface Hike {
     travelLogistics?: string;
     accommodation?: string;
     countries?: string[];
+    activityType?: 'hiking' | 'bicycletouring' | 'bikepacking';
+    coverImage?: string;
 }

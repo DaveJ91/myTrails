@@ -253,4 +253,71 @@ export class HikesService {
             throw new Error(`Failed to generate accommodation info: ${error.message}`);
         }
     }
+
+    async analyzeGpx(gpxContent: string): Promise<{ title: string; description: string; countries: string[]; allTrailsUrl: string; coverImage: string; activityType: 'hiking' | 'bicycletouring' }> {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error('GEMINI_API_KEY not configured');
+        }
+
+        try {
+            const { GoogleGenerativeAI } = require('@google/generative-ai');
+            const genAI = new GoogleGenerativeAI(apiKey);
+
+            // Try multiple model names as fallbacks
+            const modelNames = [
+                "gemini-flash-latest",
+                "gemini-2.5-flash",
+                "gemini-2.5-pro",
+                "gemini-3-pro-preview"
+            ];
+
+            let model;
+            let lastError;
+
+            for (const modelName of modelNames) {
+                try {
+                    model = genAI.getGenerativeModel({ model: modelName });
+
+                    const prompt = `Analyze this GPX file content and provide a JSON response with the following fields:
+                    - title: The official name of the route or trail (e.g. "Tour du Mont Blanc", "West Highland Way"). Do NOT use generic titles like "Morning Hike".
+                    - description: A brief summary of the route (approx 2-3 sentences).
+                    - countries: An array of country names that this route passes through (e.g. ["Italy", "France"]).
+                    - allTrailsUrl: A likely AllTrails URL for this hike if it's a known trail, otherwise null.
+                    - activityType: Infer whether this is likely "hiking" or "bicycletouring" based on the distance and terrain.
+                    - imagePrompt: A short, descriptive prompt for an AI image generator to create a vector-style illustration of the landscape. Include keywords like "flat vector art", "minimalist", "vibrant colors", "nature scene". Describe the specific terrain (e.g. "snowy mountains", "lush forest", "coastal cliffs") based on the location/elevation. Animation anime style.
+
+                    Here is the GPX content (truncated if too long):
+                    ${gpxContent.substring(0, 10000)}...
+
+                    Return ONLY valid JSON.`;
+
+                    const result = await model.generateContent(prompt);
+                    const response = await result.response;
+                    const text = response.text();
+
+                    // Clean up markdown code blocks if present
+                    const jsonStr = text.replace(/```json\n?|\n?```/g, '').trim();
+                    const data = JSON.parse(jsonStr);
+
+                    // Generate image URL using Pollinations.ai
+                    if (data.imagePrompt) {
+                        const encodedPrompt = encodeURIComponent(data.imagePrompt);
+                        data.coverImage = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=600&nologo=true`;
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.log(`Failed with model ${modelName}:`, error.message);
+                    lastError = error;
+                    continue;
+                }
+            }
+
+            throw lastError || new Error('All model attempts failed');
+        } catch (error) {
+            console.error('Error analyzing GPX:', error);
+            throw new Error(`Failed to analyze GPX: ${error.message}`);
+        }
+    }
 }
